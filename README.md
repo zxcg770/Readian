@@ -1,16 +1,11 @@
 # Readian
 
-一个事件驱动的 Serverless AI 阅读复盘Agent。语音/文字笔记 → 转写 → 分类 →
-写入 Obsidian vault → AI 追问，帮助阅读用户把"读过"变成"想清楚、写出来"。
+Obsidian + 微信读书划线流程运行的自动化 AI 阅读复盘 Agent。基于用户输入的语音/文字笔记 → 转写 → 分类 → 写入 Obsidian vault → AI 追问，帮助阅读用户把"读过"变成"想清楚、写出来"。
 
-不是读书笔记 App，是一个贴着你已有的 Obsidian + 微信读书划线流程运行的自动化管道。
 
 ## 项目简介
 
-平时读书随口录的语音、划的线，大概率只会躺在笔记里再也不会被看第二眼。
-Readian 把这些原始输入接进一条自动流水线：语音传上去就自动转写分类归档，
-每天检查有没有新内容还没复盘，复盘时不直接告诉你"该怎么想"，而是针对你
-自己写的疑问、划的线追问下去——逼着表达能力被真正用到。
+将微信读书的划线或（语音/文字）笔记同步至Obsidian，自动转写分类归档，每日检查新内容复盘，Readian针对个人的笔记思考进行追问，引导用户整理并发散读后思考，以写作输出的形式锻炼用户表达能力。
 
 ## 架构
 
@@ -61,7 +56,7 @@ pip install -r requirements.txt
 cp .env.example .env   
 ```
 
-先把 Obsidian vault 变成一个 GitHub 私有仓库（装 **Obsidian Git** 插件，设置自动 pull 间隔），
+利用 **Obsidian Git** 插件将 vault 设置为 GitHub 私有仓库，
 在 vault 里建好 `Readian/书籍/`、`Readian/待整理/` 目录。跑一段测试语音：
 
 ```bash
