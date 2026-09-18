@@ -1,0 +1,22 @@
+# 密钥与本地配置——真实值只活在环境变量 / .env 里，不进仓库
+.env
+.env.*
+!.env.example
+obsidian-plugin/data.json
+
+# Python
+__pycache__/
+*.pyc
+venv/
+package/
+*.egg-info/
+readian-vault-mcp/.venv/
+
+# Node
+node_modules/
+
+# 构建产物
+*.zip
+
+# OS
+.DS_Store

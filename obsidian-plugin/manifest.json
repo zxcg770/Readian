@@ -1,0 +1,9 @@
+{
+  "id": "readian",
+  "name": "Readian",
+  "version": "0.1.0",
+  "minAppVersion": "1.4.0",
+  "description": "AI 引导式阅读复盘，把语音笔记和划线转化为自己的思考输出",
+  "author": "shoo",
+  "isDesktopOnly": false
+}
