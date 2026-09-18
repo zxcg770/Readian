@@ -1,11 +1,11 @@
 # Readian
 
-一个事件驱动的 Serverless AI 阅读复盘工具。语音/文字笔记 → 转写 → 分类 →
-写入 Obsidian vault → AI 追问，帮你把"读过"变成"想清楚、写出来"。
+一个事件驱动的 Serverless AI 阅读复盘Agent。语音/文字笔记 → 转写 → 分类 →
+写入 Obsidian vault → AI 追问，帮助阅读用户把"读过"变成"想清楚、写出来"。
 
 不是读书笔记 App，是一个贴着你已有的 Obsidian + 微信读书划线流程运行的自动化管道。
 
-## 它解决什么问题
+## 项目简介
 
 平时读书随口录的语音、划的线，大概率只会躺在笔记里再也不会被看第二眼。
 Readian 把这些原始输入接进一条自动流水线：语音传上去就自动转写分类归档，
@@ -52,29 +52,13 @@ Lambda C: review
 | [`obsidian-plugin/`](obsidian-plugin) | Obsidian 插件：组装复盘上下文、调用 Lambda C、把问题写回笔记 | 手动命令 |
 | [`readian-vault-mcp/`](readian-vault-mcp) | MCP Server：把 vault 读写封装成标准工具（`list_notes` / `read_note` / `append_to_section` / `write_note`），供 Lambda D 等后端调用，替代原来散落的 GitHub REST 调用 | stdio |
 
-## 几个值得展开讲的设计决定
 
-- **`process()` 是纯函数**。Phase 1 本地脚本和 Phase 2 的 S3 触发 Lambda 共用同一份业务逻辑，
-  [`lambda_handler.py`](lambda_handler.py) 只是在外面包了一层解析 S3 事件的壳，一行业务代码没改。
-- **用 Anthropic Tool Use 强制结构化输出**。[`lambda_review.py`](lambda_review.py) 用
-  `tool_choice={"type": "tool", ...}` 逼模型只能通过工具调用返回结果，彻底消除了"中文引用里出现未转义引号
-  把 JSON 撑破"这类解析错误。
-- **策略配额和轮次上限下沉到代码层**，不是写在 prompt 里"拜托"模型收敛——`QUOTA`、
-  `MAX_TURNS_PER_ANCHOR`、`MAX_TURNS_PER_SESSION` 由 Python 代码强制执行，模型看不到超额的策略选项。
-- **笔记文件本身就是会话状态**，没有额外的状态存储。对话历史、书籍状态全部从当前笔记的 Markdown
-  内容里 parse 出来，换掉客户端也不用迁移数据库。
-- **MCP Server 是一层可复用的抽象**，不是重复实现。[`lambda_notify.py`](lambda_notify.py) 的
-  `collect_books()` 通过 stdio 拉起 [`readian_vault_server.py`](readian-vault-mcp/readian_vault_server.py)
-  子进程，用标准 MCP 协议调用 `list_notes`/`read_note`，替换掉了原来直连 GitHub REST API 的代码；
-  而 Obsidian 插件的交互式复盘命令仍然走本地文件读写——因为那条路径需要的是"编辑器里立刻看到结果"的
-  即时性，接到走 GitHub API 的 MCP 反而会因为 Obsidian Git 的同步间隔引入延迟，两种访问模式该用不同的实现。
-
-## 本地跑起来
+## 本地运行
 
 ```bash
 python -m venv venv && source venv/bin/activate
 pip install -r requirements.txt
-cp .env.example .env   # 填入你的凭证，见下面的环境变量表
+cp .env.example .env   
 ```
 
 先把 Obsidian vault 变成一个 GitHub 私有仓库（装 **Obsidian Git** 插件，设置自动 pull 间隔），
@@ -116,7 +100,7 @@ pip install -r requirements.txt
 ## 项目结构
 
 ```
-src/                    Phase 1 核心流程：config / github_client / vault / transcribe / classify / main
+src/                     Phase 1 核心流程：config / github_client / vault / transcribe / classify / main
 lambda_handler.py        Lambda B：S3 事件 → process()
 lambda_uploader.py       Lambda A：接收上传
 lambda_review.py         Lambda C：复盘/写作对话引擎
